@@ -1,14 +1,26 @@
 import os
 import time
 import streamlit as st
-from google import genai
-from google.genai import errors
+
+# Secure API Key loading from Streamlit Secrets
+api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
+
+if not api_key:
+    st.error("⚠️ GEMINI_API_KEY not found! Please add it in Streamlit Cloud under Manage app -> Settings -> Secrets.")
+    st.stop()
+
+# Import Gemini SDK
+try:
+    from google import genai
+    from google.genai import errors
+    client = genai.Client(api_key=api_key)
+except ImportError:
+    st.error("⚠️ The 'google-genai' library is missing. Please check your requirements.txt and reboot the app.")
+    st.stop()
 
 # Page Configuration
 st.set_page_config(page_title="Professional Email Assistant", page_icon="✉️", layout="wide")
-
 st.title("✉️ Professional AI Email Generator")
-st.write("Generate tailored, professional emails in seconds using Gemini.")
 
 # Read API Key securely from Streamlit Cloud Secrets or Environment Variables
 api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
